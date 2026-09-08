@@ -1,3 +1,7 @@
+$env:SONAR_TOKEN = "b6e8bde3e1974202b6b9d2966bed2af0938b9bc8"
+
+mvn clean verify sonar:sonar "-Dsonar.projectKey=rahul-chattopadhyay_retailorderhub" "-Dsonar.organization=rahul-chattopadhyay" "-Dsonar.host.url=https://sonarcloud.io" "-Dsonar.login=$env:SONAR_TOKEN"
+
 mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar `
   "-Dsonar.projectKey=rahul-chattopadhyay_retailorderhub" `
   "-Dsonar.organization=rahul-chattopadhyay" `

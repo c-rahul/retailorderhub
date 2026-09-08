@@ -1,21 +1,20 @@
 # RetailOrderHub
 
 Monolithic full-stack Java application built for the 5-day System Design training
-program. This is the **Day 1 baseline** — a deliberately simple, single-deployable
-Spring Boot app with one intentionally messy `OrderManager` class, used as the
-reference codebase for Day 1's Lab 1 (HLD vs LLD) and Lab 2 (SonarCloud) materials.
+program. This is a deliberately simple, single-deployable Spring Boot app used
+for system design training and SonarCloud demonstrations.
 
 ## Stack
 
-- **Java 17**
-- **Spring Boot 3.3** (Spring MVC + Thymeleaf server-rendered views — a true
+- **Java 25**
+- **Spring Boot 3.5** (Spring MVC + Thymeleaf server-rendered views — a true
   monolith, one JAR serves both UI and backend)
 - **Spring Data JPA + H2** (in-memory, zero setup — resets on every restart)
 - **Maven**
 
 ## Prerequisites
 
-- JDK 17 or later
+- JDK 25 or later
 - Maven 3.9+ (or use your IDE's built-in Maven support)
 
 ## Running it
@@ -46,24 +45,18 @@ On the home page, use one of the seeded product names exactly as shown in the
 catalog (e.g. `Laptop, Mouse`), any customer ID, and any payment method. A
 successful order will appear on the `/orders` page.
 
-## About `OrderManager`
+## Service design
 
-`src/main/java/com/training/retailorderhub/service/OrderManager.java` is
-**deliberately** written the way a real legacy class often looks, to give Day 1's
-labs something concrete to analyze:
+Order processing follows the SOLID principles through focused collaborators:
 
-| Smell / Issue | Where |
-|---|---|
-| God Object / Long Method | `processOrder()` handles validation, inventory checks, payment, persistence, and inventory updates all in one method |
-| Duplicated Code | `validateCustomer()` / `validateItems()` repeat logic already inline at the top of `processOrder()` |
-| Primitive Obsession | `paymentMethod` is a raw `String` compared with `.equals()` instead of an enum or strategy |
-| SQL Injection (Vulnerability) | `getInventoryQuantity()` and the inventory-update query in `processOrder()` build native SQL by directly concatenating `itemName` |
+- `OrderService` orchestrates the use case.
+- `OrderValidator` handles customer and item validation.
+- `InventoryService` handles stock checks and updates with parameterized queries.
+- `OrderCreator` builds and persists orders.
+- `PaymentStrategy` implementations isolate credit-card, PayPal, and gift-card behavior.
+- `PaymentStrategyFactory` selects the payment strategy without changing the order flow.
 
-This is intentional and matches the code referenced in the Day 1 Lab 1 worksheet
-and the Lab 2 SonarCloud demo/lab documents. **Do not use this class as a model
-for production code** — Day 2 refactors it through the SOLID principles.
-
-## Running the Day 1 SonarCloud scan against this project
+## Running the SonarCloud scan against this project
 
 ```bash
 mvn clean verify sonar:sonar \
@@ -73,7 +66,8 @@ mvn clean verify sonar:sonar \
   -Dsonar.login=$SONAR_TOKEN
 ```
 
-See the Lab 2 documents for the full demo script and hands-on steps.
+Run `mvn clean verify` first to execute the tests and generate JaCoCo reports under
+`target/site/jacoco/`.
 
 ## Project structure
 
@@ -89,7 +83,17 @@ retailorderhub/
     │   ├── model/Order.java
     │   ├── repository/ProductRepository.java
     │   ├── repository/OrderRepository.java
-    │   └── service/OrderManager.java
+    │   └── service/
+    │       ├── OrderService.java
+    │       ├── OrderValidator.java
+    │       ├── InventoryService.java
+    │       ├── OrderCreator.java
+    │       └── payment/
+    │           ├── PaymentStrategy.java
+    │           ├── PaymentStrategyFactory.java
+    │           ├── CreditCardPaymentStrategy.java
+    │           ├── PaypalPaymentStrategy.java
+    │           └── GiftCardPaymentStrategy.java
     └── resources/
         ├── application.properties
         ├── data.sql

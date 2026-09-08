@@ -1,19 +1,15 @@
 package com.training.retailorderhub;
 
-import static org.mockito.Mockito.mockStatic;
-
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.springframework.boot.SpringApplication;
 
 class RetailOrderHubApplicationTest {
 
     @Test
-    void mainDelegatesToSpringApplication() {
-        try (MockedStatic<SpringApplication> springApplication = mockStatic(SpringApplication.class)) {
-            RetailOrderHubApplication.main(new String[] {"--test"});
-            springApplication.verify(() -> SpringApplication.run(RetailOrderHubApplication.class,
-                    new String[] {"--test"}));
-        }
+    void mainStartsApplicationWithoutWebServer() {
+        RetailOrderHubApplication.main(new String[] {
+                "--spring.main.web-application-type=none",
+                "--spring.main.banner-mode=off",
+                "--spring.datasource.url=jdbc:h2:mem:applicationtest"
+        });
     }
 }

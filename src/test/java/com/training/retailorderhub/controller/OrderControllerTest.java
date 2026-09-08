@@ -12,51 +12,51 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 
-import com.training.retailorderhub.repository.OrderRepository;
-import com.training.retailorderhub.repository.ProductRepository;
-import com.training.retailorderhub.service.OrderManager;
+import com.training.retailorderhub.service.OrderQueryService;
+import com.training.retailorderhub.service.OrderService;
+import com.training.retailorderhub.service.ProductCatalogService;
 
 class OrderControllerTest {
 
-    private ProductRepository productRepository;
-    private OrderRepository orderRepository;
-    private OrderManager orderManager;
+    private ProductCatalogService productCatalogService;
+    private OrderQueryService orderQueryService;
+    private OrderService orderService;
     private OrderController controller;
 
     @BeforeEach
     void setUp() {
-        productRepository = mock(ProductRepository.class);
-        orderRepository = mock(OrderRepository.class);
-        orderManager = mock(OrderManager.class);
-        controller = new OrderController(productRepository, orderRepository, orderManager);
+        productCatalogService = mock(ProductCatalogService.class);
+        orderQueryService = mock(OrderQueryService.class);
+        orderService = mock(OrderService.class);
+        controller = new OrderController(productCatalogService, orderQueryService, orderService);
     }
 
     @Test
     void indexLoadsProducts() {
-        when(productRepository.findAll()).thenReturn(List.of());
+        when(productCatalogService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         assertEquals("index", controller.index(model));
         assertEquals(List.of(), model.getAttribute("products"));
-        verify(productRepository).findAll();
+        verify(productCatalogService).findAll();
     }
 
     @Test
     void placeOrderTrimsItemsAndReportsSuccess() {
-        when(orderManager.processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25)).thenReturn(true);
-        when(productRepository.findAll()).thenReturn(List.of());
+        when(orderService.processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25)).thenReturn(true);
+        when(productCatalogService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         assertEquals("index", controller.placeOrder("customer", " Laptop, ,Mouse ", "PAYPAL", 25, model));
         assertEquals(true, model.getAttribute("orderSuccess"));
-        verify(orderManager).processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25);
-        verify(productRepository).findAll();
+        verify(orderService).processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25);
+        verify(productCatalogService).findAll();
     }
 
     @Test
     void placeOrderReportsFailure() {
-        when(orderManager.processOrder("customer", List.of("Laptop"), "CASH", 25)).thenReturn(false);
-        when(productRepository.findAll()).thenReturn(List.of());
+        when(orderService.processOrder("customer", List.of("Laptop"), "CASH", 25)).thenReturn(false);
+        when(productCatalogService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         assertEquals("index", controller.placeOrder("customer", "Laptop", "CASH", 25, model));
@@ -65,11 +65,11 @@ class OrderControllerTest {
 
     @Test
     void listOrdersLoadsOrders() {
-        when(orderRepository.findAll()).thenReturn(List.of());
+        when(orderQueryService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         assertEquals("orders", controller.listOrders(model));
         assertEquals(List.of(), model.getAttribute("orders"));
-        verify(orderRepository).findAll();
+        verify(orderQueryService).findAll();
     }
 }

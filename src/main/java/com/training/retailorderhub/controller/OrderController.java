@@ -1,8 +1,8 @@
 package com.training.retailorderhub.controller;
 
-import com.training.retailorderhub.repository.OrderRepository;
-import com.training.retailorderhub.repository.ProductRepository;
+import com.training.retailorderhub.service.OrderQueryService;
 import com.training.retailorderhub.service.OrderService;
+import com.training.retailorderhub.service.ProductCatalogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,21 +16,21 @@ import java.util.stream.Collectors;
 @Controller
 public class OrderController {
 
-    private final ProductRepository productRepository;
-    private final OrderRepository orderRepository;
+    private final ProductCatalogService productCatalogService;
+    private final OrderQueryService orderQueryService;
     private final OrderService orderService;
 
-    public OrderController(ProductRepository productRepository,
-                            OrderRepository orderRepository,
+    public OrderController(ProductCatalogService productCatalogService,
+                            OrderQueryService orderQueryService,
                             OrderService orderService) {
-        this.productRepository = productRepository;
-        this.orderRepository = orderRepository;
+        this.productCatalogService = productCatalogService;
+        this.orderQueryService = orderQueryService;
         this.orderService = orderService;
     }
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("products", productRepository.findAll());
+        model.addAttribute("products", productCatalogService.findAll());
         return "index";
     }
 
@@ -47,14 +47,14 @@ public class OrderController {
 
         boolean success = orderService.processOrder(customerId, items, paymentMethod, amount);
 
-        model.addAttribute("products", productRepository.findAll());
+        model.addAttribute("products", productCatalogService.findAll());
         model.addAttribute("orderSuccess", success);
         return "index";
     }
 
     @GetMapping("/orders")
     public String listOrders(Model model) {
-        model.addAttribute("orders", orderRepository.findAll());
+        model.addAttribute("orders", orderQueryService.findAll());
         return "orders";
     }
 }

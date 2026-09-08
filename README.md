@@ -63,7 +63,7 @@ mvn clean verify sonar:sonar \
   -Dsonar.projectKey=<your-project-key> \
   -Dsonar.organization=<your-org> \
   -Dsonar.host.url=https://sonarcloud.io \
-  -Dsonar.login=$SONAR_TOKEN
+  -Dsonar.token=$SONAR_TOKEN
 ```
 
 Run `mvn clean verify` first to execute the tests and generate JaCoCo reports under

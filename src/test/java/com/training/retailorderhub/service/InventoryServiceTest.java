@@ -48,6 +48,7 @@ class InventoryServiceTest {
     void treatsMissingItemAsEmptyStock() {
         Query query = mock(Query.class);
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.setParameter(anyString(), anyString())).thenReturn(query);
         when(query.getSingleResult()).thenThrow(new NoResultException());
 
         assertFalse(inventoryService.hasStock(List.of("Unknown")));
@@ -62,11 +63,13 @@ class InventoryServiceTest {
     void decrementsEveryItem() {
         Query query = mock(Query.class);
         when(entityManager.createNativeQuery(anyString())).thenReturn(query);
+        when(query.setParameter(anyString(), anyString())).thenReturn(query);
 
         inventoryService.decrement(List.of("Laptop", "Mouse"));
 
-        verify(entityManager).createNativeQuery("UPDATE product SET quantity = quantity - 1 WHERE name = 'Laptop'");
-        verify(entityManager).createNativeQuery("UPDATE product SET quantity = quantity - 1 WHERE name = 'Mouse'");
+        verify(entityManager, org.mockito.Mockito.times(2))
+                .createNativeQuery("UPDATE product SET quantity = quantity - 1 WHERE name = :itemName");
+        verify(query, org.mockito.Mockito.times(2)).setParameter(anyString(), anyString());
         verify(query, org.mockito.Mockito.times(2)).executeUpdate();
     }
 
@@ -74,6 +77,7 @@ class InventoryServiceTest {
         AtomicInteger index = new AtomicInteger();
         when(entityManager.createNativeQuery(anyString())).thenAnswer(invocation -> {
             Query query = mock(Query.class);
+            when(query.setParameter(anyString(), anyString())).thenReturn(query);
             when(query.getSingleResult()).thenReturn(quantities[index.getAndIncrement()]);
             return query;
         });

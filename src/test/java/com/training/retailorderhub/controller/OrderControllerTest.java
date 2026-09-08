@@ -14,21 +14,21 @@ import org.springframework.ui.Model;
 
 import com.training.retailorderhub.repository.OrderRepository;
 import com.training.retailorderhub.repository.ProductRepository;
-import com.training.retailorderhub.service.OrderManager;
+import com.training.retailorderhub.service.OrderService;
 
 class OrderControllerTest {
 
     private ProductRepository productRepository;
     private OrderRepository orderRepository;
-    private OrderManager orderManager;
+    private OrderService orderService;
     private OrderController controller;
 
     @BeforeEach
     void setUp() {
         productRepository = mock(ProductRepository.class);
         orderRepository = mock(OrderRepository.class);
-        orderManager = mock(OrderManager.class);
-        controller = new OrderController(productRepository, orderRepository, orderManager);
+        orderService = mock(OrderService.class);
+        controller = new OrderController(productRepository, orderRepository, orderService);
     }
 
     @Test
@@ -43,19 +43,19 @@ class OrderControllerTest {
 
     @Test
     void placeOrderTrimsItemsAndReportsSuccess() {
-        when(orderManager.processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25)).thenReturn(true);
+        when(orderService.processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25)).thenReturn(true);
         when(productRepository.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         assertEquals("index", controller.placeOrder("customer", " Laptop, ,Mouse ", "PAYPAL", 25, model));
         assertEquals(true, model.getAttribute("orderSuccess"));
-        verify(orderManager).processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25);
+        verify(orderService).processOrder("customer", List.of("Laptop", "Mouse"), "PAYPAL", 25);
         verify(productRepository).findAll();
     }
 
     @Test
     void placeOrderReportsFailure() {
-        when(orderManager.processOrder("customer", List.of("Laptop"), "CASH", 25)).thenReturn(false);
+        when(orderService.processOrder("customer", List.of("Laptop"), "CASH", 25)).thenReturn(false);
         when(productRepository.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 

@@ -25,15 +25,17 @@ public class InventoryService {
 
     public void decrement(List<String> itemNames) {
         for (String itemName : itemNames) {
-            String updateQuery = "UPDATE product SET quantity = quantity - 1 WHERE name = '" + itemName + "'";
-            entityManager.createNativeQuery(updateQuery).executeUpdate();
+            entityManager.createNativeQuery("UPDATE product SET quantity = quantity - 1 WHERE name = :itemName")
+                    .setParameter("itemName", itemName)
+                    .executeUpdate();
         }
     }
 
     private int getInventoryQuantity(String itemName) {
-        String query = "SELECT quantity FROM product WHERE name = '" + itemName + "'";
         try {
-            Object result = entityManager.createNativeQuery(query).getSingleResult();
+            Object result = entityManager.createNativeQuery("SELECT quantity FROM product WHERE name = :itemName")
+                    .setParameter("itemName", itemName)
+                    .getSingleResult();
             return ((Number) result).intValue();
         } catch (NoResultException e) {
             return 0;

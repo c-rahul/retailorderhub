@@ -9,14 +9,14 @@ import com.training.retailorderhub.service.payment.PaymentStrategy;
 import com.training.retailorderhub.service.payment.PaymentStrategyFactory;
 
 @Service
-public class OrderManager {
+public class OrderService {
 
     private final OrderValidator orderValidator;
     private final InventoryService inventoryService;
     private final OrderCreator orderCreator;
     private final PaymentStrategyFactory paymentStrategyFactory;
 
-    public OrderManager(OrderValidator orderValidator,
+    public OrderService(OrderValidator orderValidator,
                         InventoryService inventoryService,
                         OrderCreator orderCreator,
                         PaymentStrategyFactory paymentStrategyFactory) {

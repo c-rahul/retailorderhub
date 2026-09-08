@@ -22,6 +22,7 @@
     <properties>
         <java.version>25</java.version>
         <jacoco.version>0.8.13</jacoco.version>
+        <sonar.sources>src/main/java,src/main/resources</sonar.sources>
     </properties>
     <dependencies>
         <dependency>
